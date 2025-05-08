@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Maplibre 3.6.2</title>
+    <meta property="og:description" content="Use extrusions to display buildings' height in 3D." />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="../../cdn/maplibre/maplibre3.6.2.css" />
+    <script src="../../cdn/maplibre/maplibre3.6.2.js"></script>
+    <!-- <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" />
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/@sakitam-gis/maplibre-wind@2.0.3/dist/maplibre-wind.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body,
+      #map {
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <script>
+      const map = new maplibregl.Map({
+        container: 'map', // container id
+        style: 'https://demotiles.maplibre.org/style.json', // style URL
+        center: [0, 0], // starting position [lng, lat]
+        zoom: 1 // starting zoom
+      });
+      window.map = map;
+
+      map.on('load', () => {
+        fetch('https://blog.sakitam.com/wind-layer/data/countries-110m.geojson').then((clip) => {
+          const source = new maplibreWind.ImageSource('wind', {
+            url: 'https://blog.sakitam.com/wind-layer/data/tiles/2023111700/2023111703/0/0/0/wind-surface.jpeg',
+            coordinates: [
+              [-180, 85.051129],
+              [180, 85.051129],
+              [180, -85.051129],
+              [-180, -85.051129]
+            ],
+            decodeType: maplibreWind.DecodeType.imageWithExif,
+            wrapX: true
+          });
+
+          const windColor = [
+            [0, [98, 113, 183, 255]],
+            [1, [57, 97, 159, 255]],
+            [3, [74, 148, 169, 255]],
+            [5, [77, 141, 123, 255]],
+            [7, [83, 165, 83, 255]],
+            [9, [53, 159, 53, 255]],
+            [11, [167, 157, 81, 255]],
+            [13, [159, 127, 58, 255]],
+            [15, [161, 108, 92, 255]],
+            [17, [129, 58, 78, 255]],
+            [19, [175, 80, 136, 255]],
+            [21, [117, 74, 147, 255]],
+            [24, [109, 97, 163, 255]],
+            [27, [68, 105, 141, 255]],
+            [29, [92, 144, 152, 255]],
+            [36, [125, 68, 165, 255]],
+            [46, [231, 215, 215, 256]],
+            [51, [219, 212, 135, 256]],
+            [77, [205, 202, 112, 256]],
+            [104, [128, 128, 128, 255]]
+          ];
+
+          const interpolateColor = windColor.reduce((result, item, key) => result.concat(item[0], `rgba(${item[1].join(',')})`), []);
+
+          const layer = new maplibreWind.Layer('wind', source, {
+            styleSpec: {
+              'fill-color': ['interpolate', ['linear'], ['get', 'value'], ...interpolateColor],
+              opacity: 1
+            },
+            renderFrom: maplibreWind.RenderFrom.rg,
+            displayRange: [0, 104],
+            renderType: maplibreWind.RenderType.colorize,
+            picking: true,
+            mask: {
+              data: clip,
+              // type: mapboxWind.MaskType.outside,
+              type: maplibreWind.MaskType.inside // 默认是 inside，即只显示范围内的
+            }
+          });
+
+          const particlesConfig = {
+            speedFactor: ['interpolate', ['exponential', 0.5], ['zoom'], 0, 1, 15, 0.01],
+            fadeOpacity: 0.93,
+            dropRate: 0.003,
+            dropRateBump: 0.002
+          };
+
+          const wind = new maplibreWind.Layer('wind-particles', source, {
+            styleSpec: {
+              'fill-color': ['interpolate', ['step', 1], ['get', 'value'], 0, '#fff', 104, '#fff'],
+              opacity: ['interpolate', ['exponential', 0.5], ['zoom'], 1, 1, 2, 1],
+              numParticles: [
+                'interpolate',
+                ['exponential', 0.5],
+                ['zoom'],
+                0, // zoom
+                65535 / 8, // numParticles
+                8, // zoom
+                65535 / 16 // numParticles
+              ],
+              ...particlesConfig
+            },
+            renderFrom: maplibreWind.RenderFrom.rg,
+            displayRange: [0, 104],
+            renderType: maplibreWind.RenderType.particles
+            // mask: {
+            //   data: clip,
+            //   // type: mapboxWind.MaskType.outside,
+            //   type: mapboxWind.MaskType.inside, // 默认是 inside，即只显示范围内的
+            // }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
