@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Maplibre 3.0.0-pre.1</title>
+    <title>Maplibre 4.7.1</title>
     <meta property="og:description" content="Use extrusions to display buildings' height in 3D." />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- <link rel="stylesheet" href="../../cdn/maplibre/maplibre3.0.0-pre.1.css" />
-    <script src="../../cdn/maplibre/maplibre3.0.0-pre.1.js"></script> -->
-    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.0.0-pre.1/dist/maplibre-gl.css" />
-    <script src="https://unpkg.com/maplibre-gl@3.0.0-pre.1/dist/maplibre-gl.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@sakitam-gis/maplibre-wind@2.0.3/dist/maplibre-wind.js"></script>
     <style>
       body {
@@ -81,12 +79,12 @@
             renderFrom: maplibreWind.RenderFrom.rg,
             displayRange: [0, 104],
             renderType: maplibreWind.RenderType.colorize,
-            picking: true,
-            mask: {
-              data: clip,
-              // type: mapboxWind.MaskType.outside,
-              type: maplibreWind.MaskType.inside // 默认是 inside，即只显示范围内的
-            }
+            picking: true
+            // mask: {
+            //   data: clip,
+            //   // type: mapboxWind.MaskType.outside,
+            //   type: maplibreWind.MaskType.inside // 默认是 inside，即只显示范围内的
+            // }
           });
 
           const particlesConfig = {
@@ -120,6 +118,9 @@
             //   type: mapboxWind.MaskType.inside, // 默认是 inside，即只显示范围内的
             // }
           });
+
+          map.addLayer(layer);
+          map.addLayer(wind);
         });
       });
     </script>

@@ -70,10 +70,7 @@
           [104, [128, 128, 128, 255]]
         ];
 
-        const interpolateColor = windColor.reduce(
-          (result, item, key) => result.concat(item[0], `rgba(${item[1].join(',')})`),
-          []
-        );
+        const interpolateColor = windColor.reduce((result, item, key) => result.concat(item[0], `rgba(${item[1].join(',')})`), []);
 
         const layer = new maplibreWind.Layer('wind', source, {
           styleSpec: {
