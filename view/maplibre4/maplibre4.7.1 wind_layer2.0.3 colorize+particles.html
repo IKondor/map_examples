@@ -32,9 +32,14 @@
       });
       window.map = map;
 
+      // const url = '../assets/20250512_00_gfs.t00z.pgrb2.0p25.f000.20250512.U+V.surface.jpg';
+      const url = '../assets/wind-surface.jpeg';
+
+      const displayRange = [0, 104];
+
       map.on('load', () => {
         const source = new maplibreWind.ImageSource('wind', {
-          url: 'https://blog.sakitam.com/wind-layer/data/tiles/2023111700/2023111703/0/0/0/wind-surface.jpeg',
+          url,
           coordinates: [
             [-180, 85.051129],
             [180, 85.051129],
@@ -73,10 +78,10 @@
         const layer = new maplibreWind.Layer('wind', source, {
           styleSpec: {
             'fill-color': ['interpolate', ['linear'], ['get', 'value'], ...interpolateColor],
-            opacity: 1
+            opacity: 0.7
           },
           renderFrom: maplibreWind.RenderFrom.rg,
-          displayRange: [0, 104],
+          displayRange,
           renderType: maplibreWind.RenderType.colorize,
           picking: true
           // mask: {
@@ -96,7 +101,7 @@
         const wind = new maplibreWind.Layer('wind-particles', source, {
           styleSpec: {
             'fill-color': ['interpolate', ['step', 1], ['get', 'value'], 0, '#fff', 104, '#fff'],
-            opacity: ['interpolate', ['exponential', 0.5], ['zoom'], 1, 1, 2, 1],
+            opacity: 1,
             numParticles: [
               'interpolate',
               ['exponential', 0.5],
@@ -109,7 +114,7 @@
             ...particlesConfig
           },
           renderFrom: maplibreWind.RenderFrom.rg,
-          displayRange: [0, 104],
+          displayRange,
           renderType: maplibreWind.RenderType.particles
           // mask: {
           //   data: clip,
